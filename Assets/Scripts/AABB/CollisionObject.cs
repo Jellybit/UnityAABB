@@ -41,7 +41,8 @@ public class CollisionObject : MonoBehaviour {
 		gameObject.UntrackMyCollisions();
 
 	}
-	
+
+	//This method is called from the Aabb script on successful collision involving this object.
 	public void CollisionTracker ( GameObject other )
 	{
 		//Check to see if this collision was already happening
@@ -49,12 +50,12 @@ public class CollisionObject : MonoBehaviour {
 		{
 			// Add this object to our list of active collisions if it's new.
 			activeCollisions.Add ( other, true );
-
+			
 			// Let all the scripts do stuff based on this collision
 			gameObject.SendMessage ( "AabbCollisionEnter", other, SendMessageOptions.DontRequireReceiver );
-
+			
 		}
-
+		
 	}
 
 	void LateUpdate() {
@@ -91,7 +92,8 @@ public class CollisionObject : MonoBehaviour {
 
 	}
 
-	//This method goes into the other scripts that need to know when a collision has happened.
+	//This example method goes into the other scripts that need to know when a collision has happened.
+	//You may erase this method from this script if you wish.
 	private void AabbCollisionEnter ( GameObject other )
 	{
 		//This is debug line you can uncomment to test collisions.
