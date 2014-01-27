@@ -24,60 +24,6 @@ public static class Aabb
 		return Intersect ( aBox, bBox );
 	}
 
-	/*
-
-	// Use this one on your transform like so: transform.Colliding( otherGameObject );
-	public static bool CollidingWithList( this Transform self, List<GameObject> others )
-	{
-		
-		bool colliding = false;
-		Rect myCollider = self.gameObject.BoxToRect();
-
-		colliding = self.RectCollidingWithList( others, myCollider );
-
-		// Find out if these guys intersect
-		return colliding;
-	}
-
-	public static bool RectCollidingWithList( this Transform self, List<GameObject> others, Rect testCollider )
-	{
-		
-		bool colliding = false;
-		
-		foreach (GameObject other in others)
-		{
-			if ( self != other )
-			{
-				if (Intersect( testCollider, other.BoxToRect()))
-				{
-					colliding = true;
-					
-					SendCollisionInfo( self.gameObject, other );
-				}
-				
-				
-			}
-			
-		}
-		
-		// Find out if these guys intersect
-		return colliding;
-	}
-
-	public static bool CollidingWithTrackedColliders( this Transform self )
-	{
-		
-		bool colliding = false;
-		Rect myCollider = self.gameObject.BoxToRect();
-		
-		colliding = self.RectCollidingWithTrackedColliders( myCollider );
-		
-		// Find out if these guys intersect
-		return colliding;
-	}
-
-	*/
-
 	public static bool CollidingWithTrackedColliders( this GameObject self )
 	{
 
@@ -113,8 +59,6 @@ public static class Aabb
 				
 				
 			}
-			//else
-				//Debug.LogWarning( "Skipping self: " + self.name );
 			
 		}
 		
@@ -142,8 +86,6 @@ public static class Aabb
 		bool comp2 = a.yMax < b.yMin;
 		bool comp3 = a.xMin < b.xMax;
 		bool comp4 = a.xMax > b.xMin;
-
-		//Debug.Log ( "(" + System.DateTime.Now + ") 1: " +comp1+ ", 2: " +comp2+ ", 3: " +comp3+ ", 4: " +comp4 );
 
 		// This will only return true if all are true.
 		return comp1 && comp2 && comp3 && comp4;
