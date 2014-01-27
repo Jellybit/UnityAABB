@@ -5,9 +5,9 @@ using System.Collections.Generic;
 [RequireComponent (typeof (BoxCollider2D))] 
 public class CollisionObject : MonoBehaviour {
 
-	//Usually, I let my character controller handle the collision checks, so that it can react, but you can set this to 
-	//true if you want it to happen automatically.
-	public bool autoCheckForCollisionsOnMovement = false;
+	//Usually, I let my character controller handle the collision checks, so that it can react, but I have this set
+	//to true by default because I assume people will want the easiest way first.
+	public bool autoCheckForCollisionsOnMovement = true;
 	private Vector3 lastPosition;
 
 	//This is where we will store our active collisions so that we're not sending messages every frame
@@ -96,7 +96,7 @@ public class CollisionObject : MonoBehaviour {
 	//You may erase this method from this script if you wish.
 	private void AabbCollisionEnter ( GameObject other )
 	{
-		//This is debug line you can uncomment to test collisions.
-		//Debug.LogWarning( gameObject.name + " collided with " + other.name + "." );
+		//I added this line because I assume you want to test collisions right out the box. This isn't required.
+		Debug.LogWarning( gameObject.name + " collided with " + other.name + "." );
 	}
 }
