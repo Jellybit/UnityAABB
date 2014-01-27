@@ -2,9 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 
+[RequireComponent (typeof (BoxCollider2D))] 
 public class CollisionObject : MonoBehaviour {
 
-	public bool checkCollisionsEveryFrame = false;
+	//Usually, I let my character controller handle the collision checks, so that it can react, but you can set this to 
+	//true if you want it to happen automatically.
+	public bool autoCheckForCollisionsOnMovement = false;
 	private Vector3 lastPosition;
 
 	//This is where we will store our active collisions so that we're not sending messages every frame
@@ -12,7 +15,14 @@ public class CollisionObject : MonoBehaviour {
 	
 	void OnStart()
 	{
+		// This is storing your position so that it knows when this object has moved and needs to recheck.
+		// We check collisions on start so that we know if we have collisions on the first frame before it moves.
 		lastPosition = transform.position;
+
+		if ( autoCheckForCollisionsOnMovement ) 
+		{
+			gameObject.CollidingWithTrackedColliders();
+		}
 	}
 
 	void OnEnable() {
@@ -27,7 +37,6 @@ public class CollisionObject : MonoBehaviour {
 
 		// This will remove from collision tracker list inside the Aabb static class when the object is disabled.
 		// When an object is destroyed, it disables itself first.
-
 		Debug.LogWarning( "Untracking myself: " + gameObject.name );
 		gameObject.UntrackMyCollisions();
 
@@ -42,7 +51,7 @@ public class CollisionObject : MonoBehaviour {
 			activeCollisions.Add ( other, true );
 
 			// Let all the scripts do stuff based on this collision
-			gameObject.SendMessage ( "CollisionEnter", other, SendMessageOptions.DontRequireReceiver );
+			gameObject.SendMessage ( "AabbCollisionEnter", other, SendMessageOptions.DontRequireReceiver );
 
 		}
 
@@ -53,8 +62,8 @@ public class CollisionObject : MonoBehaviour {
 		//Cleans up the local active collision list at the end of the frame
 		CheckStatusOfCollisions();
 
-		//TEMPORARY LINE FOR TESTING PURPOSES ONLY
-		if ( checkCollisionsEveryFrame && transform.position != lastPosition ) 
+		// This is for checking collisions automatically every frame, if you've marked that as true.
+		if ( autoCheckForCollisionsOnMovement && transform.position != lastPosition ) 
 		{
 			lastPosition = transform.position;
 			gameObject.CollidingWithTrackedColliders();
@@ -73,8 +82,7 @@ public class CollisionObject : MonoBehaviour {
 			{
 				if (!gameObject.CollidingWith( o ))
 				{
-					Debug.LogWarning( o.name + " is no longer colliding." );
-					//if ( activeCollisions.ContainsKey( o ))
+					if ( activeCollisions.ContainsKey( o ))
 						activeCollisions.Remove( o );
 				}
 			}
@@ -83,12 +91,10 @@ public class CollisionObject : MonoBehaviour {
 
 	}
 
-	private void CollisionEnter ( GameObject other )
+	//This method goes into the other scripts that need to know when a collision has happened.
+	private void AabbCollisionEnter ( GameObject other )
 	{
-		//This is what goes into your script
-
-		Debug.LogWarning( gameObject.name + " collided with " + other.name + "." );
-		//Debug.LogWarning( gameObject.name + " was at position " + gameObject.transform.position + ", and " + other.name + " was at position " + other.transform.position );
-		Debug.LogWarning( gameObject.name + " was at position x:" + gameObject.transform.position.x + ", y:" + gameObject.transform.position.y + ", and " + other.name + " was at position " + other.transform.position );
+		//This is debug line you can uncomment to test collisions.
+		//Debug.LogWarning( gameObject.name + " collided with " + other.name + "." );
 	}
 }
