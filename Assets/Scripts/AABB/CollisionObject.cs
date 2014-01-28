@@ -8,6 +8,9 @@ public class CollisionObject : MonoBehaviour {
 	//Usually, I let my character controller handle the collision checks, so that it can react, but I have this set
 	//to true by default because I assume people will want the easiest way first.
 	public bool autoCheckForCollisionsOnMovement = true;
+	public bool collisionExitMessages = false;
+
+
 	private Vector3 lastPosition;
 
 	//This is where we will store our active collisions so that we're not sending messages every frame
@@ -72,9 +75,9 @@ public class CollisionObject : MonoBehaviour {
 
 	}
 
+	// Does a check on existing collisions. If one is no longer active, take it out of the active collisions list.
 	private void CheckStatusOfCollisions()
 	{
-		// Does a check on existing collisions. If one doesn't exist, take it out of the dictionary.
 		if (activeCollisions.Count > 0)
 		{
 			Dictionary<GameObject, bool> activeCollisionsCopy = new Dictionary<GameObject, bool>(activeCollisions);
@@ -85,6 +88,9 @@ public class CollisionObject : MonoBehaviour {
 				{
 					if ( activeCollisions.ContainsKey( o ))
 						activeCollisions.Remove( o );
+
+					if ( collisionExitMessages )
+						gameObject.SendMessage ( "AabbCollisionExit", o, SendMessageOptions.DontRequireReceiver );
 				}
 			}
 
@@ -97,6 +103,6 @@ public class CollisionObject : MonoBehaviour {
 	private void AabbCollisionEnter ( GameObject other )
 	{
 		//I added this line because I assume you want to test collisions right out the box. This isn't required.
-		Debug.LogWarning( gameObject.name + " collided with " + other.name + "." );
+		Debug.Log( "(" + Time.time + "): " + gameObject.name + " collided with " + other.name + "." );
 	}
 }
