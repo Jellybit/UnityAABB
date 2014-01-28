@@ -9,7 +9,20 @@ public static class Aabb
 
 	public static Dictionary<GameObject, Rect> trackedColliders = new Dictionary<GameObject, Rect>();
 	
-	// Use this one on your transform like so: transform.Colliding( otherGameObject );
+	// This checks the intersection between two rectangles. It is used by all the other collision methods.
+	public static bool Intersect( Rect a, Rect b ) 
+	{
+		// Basic AABB collision detection. All of these must be true for there to be a collision.
+		bool comp1 = a.yMin > b.yMax;
+		bool comp2 = a.yMax < b.yMin;
+		bool comp3 = a.xMin < b.xMax;
+		bool comp4 = a.xMax > b.xMin;
+		
+		// This will only return true if all are true.
+		return comp1 && comp2 && comp3 && comp4;
+	}
+
+	// Use this one on your game object like so: gameObject.Colliding( otherGameObject );
 	public static bool CollidingWith( this GameObject self, GameObject other )
 	{
 
@@ -24,12 +37,24 @@ public static class Aabb
 		return Intersect ( aBox, bBox );
 	}
 
+	// Same thing, different approach
+	public static bool Colliding( GameObject a, GameObject b )
+	{
+		return a.CollidingWith( b );
+	}
+
+
 	public static bool CollidingWithTrackedColliders( this GameObject self )
 	{
 
 		self.UpdateMyCollisions();
 		return self.RectCollidingWithObjectsInDictionary( trackedColliders[self], trackedColliders );
 
+	}
+
+	public static bool CollidingWithObjectsInDictionary( this GameObject self, Dictionary<GameObject, Rect> colliderDictionary )
+	{
+		return self.RectCollidingWithObjectsInDictionary( self.BoxToRect(), colliderDictionary );
 	}
 
 	public static bool RectCollidingWithTrackedColliders( this GameObject self, Rect testCollider )
@@ -61,34 +86,8 @@ public static class Aabb
 			}
 			
 		}
-		
-		// Find out if these guys intersect
+
 		return colliding;
-	}
-
-	public static bool Colliding( GameObject a, GameObject b )
-	{
-		if ( !a.collider2D.enabled || !b.collider2D.enabled )
-			return false;
-
-		Rect aBox = a.BoxToRect();
-		Rect bBox = b.BoxToRect();
-
-		// Find out if these guys intersect
-		return Intersect ( aBox, bBox );
-	}
-	
-	// This checks the intersection between two rectangles.
-	public static bool Intersect( Rect a, Rect b ) 
-	{
-		// Basic AABB collision detection. All of these must be true for there to be a collision.
-		bool comp1 = a.yMin > b.yMax;
-		bool comp2 = a.yMax < b.yMin;
-		bool comp3 = a.xMin < b.xMax;
-		bool comp4 = a.xMax > b.xMin;
-
-		// This will only return true if all are true.
-		return comp1 && comp2 && comp3 && comp4;
 	}
 
 	// This converts a BoxCollider2D to a rectangle for use in determining an intersection
@@ -122,7 +121,8 @@ public static class Aabb
 		return new Vector2 (v.x, v.y);
 	}
 
-	public static Dictionary<GameObject, Rect> ListToCollisionDict( List<GameObject> list )
+	// Converts a list of objects to a dictionary.
+	public static Dictionary<GameObject, Rect> ListToCollisionDict( this List<GameObject> list )
 	{
 		Dictionary<GameObject, Rect> dictionary = new Dictionary<GameObject, Rect>();
 
