@@ -24,7 +24,7 @@ public class CollisionObject : MonoBehaviour {
 
 		if ( autoCheckForCollisionsOnMovement ) 
 		{
-			gameObject.CollidingWithTrackedColliders();
+			gameObject.isCollidingWithTrackedColliders();
 		}
 	}
 
@@ -70,7 +70,7 @@ public class CollisionObject : MonoBehaviour {
 		if ( autoCheckForCollisionsOnMovement && transform.position != lastPosition ) 
 		{
 			lastPosition = transform.position;
-			gameObject.CollidingWithTrackedColliders();
+			gameObject.isCollidingWithTrackedColliders();
 		}
 
 	}
@@ -84,7 +84,7 @@ public class CollisionObject : MonoBehaviour {
 
 			foreach (GameObject o in activeCollisionsCopy.Keys)
 			{
-				if (!gameObject.CollidingWith( o ))
+				if (!gameObject.isCollidingWith( o ))
 				{
 					if ( activeCollisions.ContainsKey( o ))
 						activeCollisions.Remove( o );
