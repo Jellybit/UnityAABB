@@ -24,7 +24,7 @@ public class CollisionObject : MonoBehaviour {
 
 		if ( autoCheckForCollisionsOnMovement ) 
 		{
-			gameObject.isCollidingWithTrackedColliders();
+			gameObject.announceCollidingWithTrackedColliders();
 		}
 	}
 
@@ -40,7 +40,6 @@ public class CollisionObject : MonoBehaviour {
 
 		// This will remove from collision tracker list inside the Aabb static class when the object is disabled.
 		// When an object is destroyed, it disables itself first.
-		Debug.LogWarning( "Untracking myself: " + gameObject.name );
 		gameObject.UntrackMyCollisions();
 
 	}
@@ -70,7 +69,7 @@ public class CollisionObject : MonoBehaviour {
 		if ( autoCheckForCollisionsOnMovement && transform.position != lastPosition ) 
 		{
 			lastPosition = transform.position;
-			gameObject.isCollidingWithTrackedColliders();
+			gameObject.announceCollidingWithTrackedColliders();
 		}
 
 	}
