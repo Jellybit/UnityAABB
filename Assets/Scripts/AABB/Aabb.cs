@@ -8,7 +8,7 @@ public static class Aabb
 {
 
 	public static Dictionary<GameObject, Rect> trackedColliders = new Dictionary<GameObject, Rect>();
-	private static bool announceCollisions = false;
+	private static bool collisionAnnouncements = false;
 	
 	// This checks the intersection between two rectangles. It is used by all the other collision methods.
 	public static bool Intersecting( Rect a, Rect b ) 
@@ -38,6 +38,9 @@ public static class Aabb
 		return Intersecting ( aBox, bBox );
 	}
 
+	// I have two versions of collision check methods. The "isColliding..." version just returns true/false, and only
+	// to the object asking. It's for informational purposes only. The second "announceColliding..." version will make 
+	// it official, announcing the collisions to any objects involved in the collision.
 	public static bool announceCollidingWith( this GameObject self, GameObject other )
 	{
 		if( self.isCollidingWith( other ))
@@ -55,15 +58,17 @@ public static class Aabb
 		return a.isCollidingWith( b );
 	}
 
-
+	//Here are the "isColliding" methods. These all funnel into a big dictionary collision check method called 
+	// "isCollidingWithDictionaryObjectsAtPosition". If we were just using the main tracked collisions, I would have
+	// simplified this more, but I'm certain people (including me) want to be able to feed in our own object lists.
 	public static bool isCollidingWithTrackedColliders( this GameObject self )
 	{
-		self.UpdateMyCollisions();
 
 		return self.isCollidingWithDictionaryObjectsAtPosition( trackedColliders, self.transform.position );
 
 	}
 
+	// This lets you feed in your own dictionary of objects
 	public static bool isCollidingWithDictionaryObjects( this GameObject self, Dictionary<GameObject, Rect> colliderDictionary )
 	{
 		return self.isCollidingWithDictionaryObjectsAtPosition( colliderDictionary, self.transform.position );
@@ -76,12 +81,12 @@ public static class Aabb
 		
 	}
 
+
+	//Here are the announcment versions of the same methods
 	public static bool announceCollidingWithTrackedColliders( this GameObject self )
 	{
-		
-		self.UpdateMyCollisions();
 
-		announceCollisions = true;
+		collisionAnnouncements = true;
 
 		return self.isCollidingWithDictionaryObjectsAtPosition( trackedColliders, self.transform.position );
 		
@@ -89,50 +94,83 @@ public static class Aabb
 	
 	public static bool announceCollidingWithDictionaryObjects( this GameObject self, Dictionary<GameObject, Rect> colliderDictionary )
 	{
-		announceCollisions = true;
+		collisionAnnouncements = true;
 
 		return self.isCollidingWithDictionaryObjectsAtPosition( colliderDictionary, self.transform.position );
 	}
 	
 	public static bool announceCollidingWithTrackedCollidersAtPosition( this GameObject self, Vector3 position )
 	{
-		announceCollisions = true;
+		collisionAnnouncements = true;
 
 		return self.isCollidingWithDictionaryObjectsAtPosition( trackedColliders, position );
 		
 	}
 
+
+	// This is where the dictionary collision checks come together. This one can be handy in movement checks to see if 
+	// your character has moved into a ground tile or something. You can feed it a dictionary consisting only of tile 
+	// objects (possibly even only local tile objects) on horizontal movement or vertical movement, then step back 
+	// until there is no collision. If you need specific information about the object, use the 
+	// whichDictionaryObjectCollidesAtPosition method directly.
 	public static bool isCollidingWithDictionaryObjectsAtPosition( this GameObject self, Dictionary<GameObject, Rect> colliderDictionary, Vector3 position )
 	{
 		
-		bool colliding = false;
+		if (self.whichDictionaryObjectCollidesAtPosition( colliderDictionary, position ) != null)
+			return true;
+		else
+			return false;
+	}
 
+	// This returns the first dictionary object you would be colliding with at a specific position. It's helpful in
+	// character controllers.
+	public static GameObject whichDictionaryObjectCollidesAtPosition( this GameObject self, Dictionary<GameObject, Rect> colliderDictionary, Vector3 position )
+	{
+		
+		GameObject collisionObject = null;
+		Rect testRectangle;
+		// Explained below
+		Rect unpredictableCollision = new Rect( 12, 34, 56, 78 );
+		
 		Dictionary<GameObject, Rect> colliderDictionaryCopy = new Dictionary<GameObject, Rect>(colliderDictionary);
-
+		
 		Rect testCollider = self.BoxToRectAtPosition( position );
 		
 		foreach (var pair in colliderDictionaryCopy)
 		{
 			if ( self != pair.Key )
 			{
-				if (Intersecting( testCollider, pair.Value ))
-				{
-					colliding = true;
+				// Here we assume the rectangle stored in the dictionary is correct unless it's set to the flag value. 
+				// This can allow you to purposefully flag some objects that you want to move around and not update
+				// positions in the tracker, while giving static objects like tiles some quick reliable info to work 
+				// with. Use gameObject.SetMyCollisionToUnpredictable to set to this flag value. Check that method
+				// for more info.
+				if ( pair.Value == unpredictableCollision )
+					testRectangle = pair.Key.BoxToRect();
+				else
+					testRectangle = pair.Value;
 
+				// Check to see if these are colliding, and store the first object involved in a collision for return.
+				if (Intersecting( testCollider, testRectangle ))
+				{
+					if ( collisionObject == null )
+						collisionObject = pair.Key;
+					
 					// not all collision checks need announcements to the objects that a collision took place.
 					// sometimes we just need to know if a collision occurred.
-					if ( announceCollisions )
+					if ( collisionAnnouncements )
 						AnnounceCollision( self, pair.Key );
 				}
 				
 				
 			}
 
-			announceCollisions = false;
+			// turn this back off so that the next collision check doesn't send announcements, unless it intends to.
+			collisionAnnouncements = false;
 			
 		}
-
-		return colliding;
+		
+		return collisionObject;
 	}
 
 	// This converts a BoxCollider2D to a rectangle for use in determining an intersection
@@ -196,6 +234,9 @@ public static class Aabb
 		
 	}
 
+	// I may remove this. It announces collisions with all objects in a dictionary. I thought someone might want to 
+	// handle the collision data on their side, and could use a simple announcement method, but the more I think about
+	// it, the less likely that is.
 	public static void AnnounceCollisionsWithDictionary ( this GameObject self, Dictionary<GameObject, Rect> colliderDictionary ) 
 	{
 		
@@ -236,26 +277,23 @@ public static class Aabb
 		trackedColliders.Remove ( self );
 	}
 
-	// ERASE THIS once the stuff below has been implemented
+	// This lets you update the collision rectangle in case it changed/moved.
 	public static void UpdateMyCollisions ( this GameObject self )
 	{
 		trackedColliders[self] = self.BoxToRect();
 	}
 
-	// ???
-	public static void SetMyCollisionToSolid ( this GameObject self )
+	// This purposefully sets the rectangle data to a flag value so it has to update the collision data manually every 
+	// check. This lets you ignore updating the object's collisions (using gameObject.UpdateMyCollisions), but it will 
+	// likely be more expensive. I would have set this to null if the dictionary allowed, and I would have set to 
+	// (0, 0, 0, 0) if I didn't think someone might want to check the center of the screen for something. Let me know 
+	// if there's a better way to handle this, because this is pretty hacky.
+	public static void SetMyCollisionToUnpredictable ( this GameObject self )
 	{
-		trackedColliders[self] = self.BoxToRect();
+		trackedColliders[self] = new Rect( 12, 34, 56, 78 );
 	}
 
-	// ???
-	public static void SetMyCollisionToDynamic ( this GameObject self )
-	{
-		// Setting to zero tells the tracker to w
-		trackedColliders[self] = new Rect( 0, 0, 0, 0 );
-	}
-
-	public static Dictionary<GameObject, Rect> UpdateAllCollisionBoxesInThisDictionary( this Dictionary<GameObject, Rect> colliderDictionary )
+	public static Dictionary<GameObject, Rect> UpdateCollisionBoxesInDictionary( this Dictionary<GameObject, Rect> colliderDictionary )
 	{
 		
 		Dictionary<GameObject, Rect> colliderDictionaryCopy = new Dictionary<GameObject, Rect>(colliderDictionary);
@@ -270,17 +308,18 @@ public static class Aabb
 
 	public static void UpdateAllTrackedCollisions( )
 	{
-		trackedColliders = trackedColliders.UpdateAllCollisionBoxesInThisDictionary();
+		trackedColliders = trackedColliders.UpdateCollisionBoxesInDictionary();
 	}
 	
 }
 
 /*
 
-To Do:
+Maybe To Do:
 
 - check point for collision
-- if collision rectangle is zero, get the current location/collision info? If one is specified, leave it static? Maybe keeps the strengths of both types.
-
+- check if point is meeting between two objects
+- possibly hold different dictionaries by collision layer
+- possibly handle child collision box objects
 
 */

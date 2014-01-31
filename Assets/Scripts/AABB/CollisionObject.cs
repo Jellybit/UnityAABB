@@ -69,6 +69,7 @@ public class CollisionObject : MonoBehaviour {
 		if ( autoCheckForCollisionsOnMovement && transform.position != lastPosition ) 
 		{
 			lastPosition = transform.position;
+			gameObject.UpdateMyCollisions();
 			gameObject.announceCollidingWithTrackedColliders();
 		}
 
