@@ -128,9 +128,6 @@ public static class Aabb
 	{
 		
 		GameObject collisionObject = null;
-		Rect testRectangle;
-		// Explained below
-		Rect unpredictableCollision = new Rect( 12, 34, 56, 78 );
 		
 		Dictionary<GameObject, Rect> colliderDictionaryCopy = new Dictionary<GameObject, Rect>(colliderDictionary);
 		
