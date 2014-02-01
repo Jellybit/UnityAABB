@@ -140,18 +140,9 @@ public static class Aabb
 		{
 			if ( self != pair.Key )
 			{
-				// Here we assume the rectangle stored in the dictionary is correct unless it's set to the flag value. 
-				// This can allow you to purposefully flag some objects that you want to move around and not update
-				// positions in the tracker, while giving static objects like tiles some quick reliable info to work 
-				// with. Use gameObject.SetMyCollisionToUnpredictable to set to this flag value. Check that method
-				// for more info.
-				if ( pair.Value == unpredictableCollision )
-					testRectangle = pair.Key.BoxToRect();
-				else
-					testRectangle = pair.Value;
 
 				// Check to see if these are colliding, and store the first object involved in a collision for return.
-				if (Intersecting( testCollider, testRectangle ))
+				if (Intersecting( testCollider, pair.Value ))
 				{
 					if ( collisionObject == null )
 						collisionObject = pair.Key;
@@ -283,34 +274,6 @@ public static class Aabb
 		trackedColliders[self] = self.BoxToRect();
 	}
 
-	// This purposefully sets the rectangle data to a flag value so it has to update the collision data manually every 
-	// check. This lets you ignore updating the object's collisions (using gameObject.UpdateMyCollisions), but it will 
-	// likely be more expensive. I would have set this to null if the dictionary allowed, and I would have set to 
-	// (0, 0, 0, 0) if I didn't think someone might want to check the center of the screen for something. Let me know 
-	// if there's a better way to handle this, because this is pretty hacky.
-	public static void SetMyCollisionToUnpredictable ( this GameObject self )
-	{
-		trackedColliders[self] = new Rect( 12, 34, 56, 78 );
-	}
-
-	public static Dictionary<GameObject, Rect> UpdateCollisionBoxesInDictionary( this Dictionary<GameObject, Rect> colliderDictionary )
-	{
-		
-		Dictionary<GameObject, Rect> colliderDictionaryCopy = new Dictionary<GameObject, Rect>(colliderDictionary);
-		
-		foreach (var pair in colliderDictionaryCopy)
-		{
-			colliderDictionaryCopy[pair.Key] = pair.Key.BoxToRect();			
-		}
-		
-		return colliderDictionaryCopy;
-	}
-
-	public static void UpdateAllTrackedCollisions( )
-	{
-		trackedColliders = trackedColliders.UpdateCollisionBoxesInDictionary();
-	}
-	
 }
 
 /*
