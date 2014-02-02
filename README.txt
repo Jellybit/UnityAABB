@@ -37,10 +37,14 @@ it log when a collision occurs in the CollisionObject script, but that whole
 AabbCollisionEnter method can be removed. I just figure people will want to do some tests 
 at this place in development.
 
-FUTURE======================================================
+FEATURES====================================================
+- Automated tracking system done by simply adding the CollisionObject script to an object
+- Announce collisions to tracked objects, and detect them with the AabbCollisionEnter
+       method.
+- Check collisions at a test position. Handy in character controllers.
+- Check collision against a supplied list of objects so you can hook it into your own
+       tree, test against only ground tiles, etc...
 
-* Test collision checks based on a position argument that don't announce the collisions.
-* Implement some kind of tree to keep collision checks down. Quad trees had some rough 
-       edges.
-* Find a graceful way to switch between the assumptions that most things don't move
-       (platformer) and that most things do move (bullet hell) for the optimal approach.
+TO DO======================================================
+- Maybe use the collision layer system built into Unity to ignore collisions with objects
+       in certain layers, or only check against a specific layer.
