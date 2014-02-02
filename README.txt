@@ -31,11 +31,12 @@ collision. Check the CollisionObject script for more info on that. You can also 
 box for exit messages if you'd like those.
 
 For simplicity's sake, I have it automatically check for collisions every frame on 
-movement. I personally like more control over when things are checked and put these checks 
-in my character controller script instead. Also by default in these early stages, I have 
-it log when a collision occurs in the CollisionObject script, but that whole 
-AabbCollisionEnter method can be removed. I just figure people will want to do some tests 
-at this place in development.
+movement. If you'd like more control over when things are checked you could disable the
+automation and put these checks in a character controller script instead. Also by default 
+in these early stages, I have it log when a collision occurs in the CollisionObject 
+script, but that whole AabbCollisionEnter method can be removed from CollisionObject.cs.
+It's just an example, and I figure people will want to do some tests at this place in 
+development.
 
 FEATURES====================================================
 - Automated tracking system done by simply adding the CollisionObject script to an object
