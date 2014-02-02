@@ -1,6 +1,6 @@
 WHAT IT DOES================================================
 This performs simple Aabb collision checks on movement or whenever you want. Simply by 
-adding a script to components you want involved in the system, it will add them to a 
+adding a script to game objects you want involved in the system, it will add them to a 
 tracker list and appropriately remove them from said list when they are 
 destroyed/disabled. Right now, I have no trees to reduce checks by region, but it has 
 some handy tools. You can check collisions between two specific objects ( Colliding ), 
