@@ -50,5 +50,6 @@ FEATURES====================================================
 TO DO======================================================
 - Add support for rotated collision boxes. Right now it only supports boxes with zero
        degrees rotation.
+- Make it update collision checks on scale change. Right now it's just position change.
 - Maybe use the collision layer system built into Unity to ignore collisions with objects
        in certain layers, or only check against a specific layer.
