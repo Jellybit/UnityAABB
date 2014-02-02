@@ -3,7 +3,8 @@ This performs simple Aabb collision checks on movement or whenever you want. Sim
 adding a script to game objects you want involved in the system, it will add them to a 
 tracker list and appropriately remove them from said list when they are 
 destroyed/disabled. Right now, I have no trees to reduce checks by region, but it has 
-some handy tools. You can check collisions between two specific objects ( Colliding ), 
+some handy tools, and is built to allow you to plug it into your own system, whatever
+that may be. You can check collisions between two specific objects ( Colliding ), 
 or feed it your own list of objects to check against 
 (gameObject.isCollidingWithDictionaryObjects).
 
