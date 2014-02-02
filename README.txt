@@ -4,7 +4,8 @@ adding a script to game objects you want involved in the system, it will add the
 tracker list and appropriately remove them from said list when they are 
 destroyed/disabled. Right now, I have no trees to reduce checks by region, but it has 
 some handy tools, and is built to allow you to plug it into your own system, whatever
-that may be. You can check collisions between two specific objects ( Colliding ), 
+that may be. In addition to the standard collision checks that are used in the
+automation, you can check collisions between two specific objects ( Colliding ), 
 or feed it your own list of objects to check against 
 (gameObject.isCollidingWithDictionaryObjects).
 
@@ -47,5 +48,7 @@ FEATURES====================================================
        tree, test against only ground tiles, etc...
 
 TO DO======================================================
+- Add support for rotated collision boxes. Right now it only supports boxes with zero
+       degrees rotation.
 - Maybe use the collision layer system built into Unity to ignore collisions with objects
        in certain layers, or only check against a specific layer.
