@@ -5,7 +5,7 @@ tracker list and appropriately remove them from said list when they are
 destroyed/disabled. Right now, I have no trees to reduce checks by region, but it has 
 some handy tools. You can check collisions between two specific objects ( Colliding ), 
 or feed it your own list of objects to check against 
-(gameObject.CollidingWithObjectsInDictionary).
+(gameObject.isCollidingWithDictionaryObjects).
 
 WHY THIS EXISTS=============================================
 The Unity3D team has put a lot of effort into giving better tools to those who make 2D 
